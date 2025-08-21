@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate PWA Icons</title>
+</head>
+<body>
+    <h1>PWA Icon Generator</h1>
+    <p>Right-click each canvas below and "Save image as" to create your PWA icons:</p>
+    
+    <h2>192x192 Icon (icon-192.png)</h2>
+    <canvas id="icon192" width="192" height="192" style="border: 1px solid #ccc;"></canvas>
+    
+    <h2>512x512 Icon (icon-512.png)</h2>
+    <canvas id="icon512" width="512" height="512" style="border: 1px solid #ccc;"></canvas>
+    
+    <script>
+        function drawIcon(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Green border
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = size * 0.05;
+            ctx.strokeRect(size * 0.1, size * 0.1, size * 0.8, size * 0.8);
+            
+            // Tempest tube effect
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = size * 0.02;
+            
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const maxRadius = size * 0.3;
+            
+            // Draw spiral tube
+            for (let i = 0; i < 8; i++) {
+                const radius = (i / 8) * maxRadius;
+                const alpha = 0.1 + (i / 8) * 0.3;
+                
+                ctx.strokeStyle = `rgba(0, 255, 0, ${alpha})`;
+                ctx.beginPath();
+                
+                for (let angle = 0; angle <= Math.PI * 2; angle += 0.1) {
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+                    
+                    if (angle === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+            }
+            
+            // Player ship (triangle)
+            ctx.fillStyle = '#00ff00';
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - size * 0.15);
+            ctx.lineTo(centerX - size * 0.1, centerY + size * 0.1);
+            ctx.lineTo(centerX + size * 0.1, centerY + size * 0.1);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Add glow effect
+            ctx.shadowColor = '#00ff00';
+            ctx.shadowBlur = size * 0.05;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+        
+        // Generate both icons
+        drawIcon('icon192', 192);
+        drawIcon('icon512', 512);
+    </script>
+</body>
+</html>

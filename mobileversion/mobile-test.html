@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Motion Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #00ff00;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .motion-display {
+            background-color: #1a1a1a;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 18px;
+        }
+        
+        .motion-value {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            min-width: 80px;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background-color: #004400;
+            color: #00ff00;
+        }
+        
+        .status.error {
+            background-color: #440000;
+            color: #ff0000;
+        }
+        
+        .status.warning {
+            background-color: #444400;
+            color: #ffff00;
+        }
+        
+        button {
+            background-color: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #00cc00;
+        }
+        
+        .instructions {
+            background-color: #1a1a1a;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Mobile Motion Sensor Test</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ul>
+                <li>Allow motion access when prompted</li>
+                <li>Tilt your device to see the values change</li>
+                <li>Alpha = Yaw (rotation around Z-axis)</li>
+                <li>Beta = Pitch (rotation around X-axis)</li>
+                <li>Gamma = Roll (rotation around Y-axis)</li>
+            </ul>
+        </div>
+        
+        <div id="status" class="status">Checking device capabilities...</div>
+        
+        <div class="motion-display">
+            <h3>Motion Values:</h3>
+            <div class="motion-value">
+                Alpha: <span id="alpha">0</span>°
+            </div>
+            <div class="motion-value">
+                Beta: <span id="beta">0</span>°
+            </div>
+            <div class="motion-value">
+                Gamma: <span id="gamma">0</span>°
+            </div>
+        </div>
+        
+        <div class="motion-display">
+            <h3>Calibrated Values:</h3>
+            <div class="motion-value">
+                Alpha: <span id="calAlpha">0</span>°
+            </div>
+            <div class="motion-value">
+                Beta: <span id="calBeta">0</span>°
+            </div>
+            <div class="motion-value">
+                Gamma: <span id="calGamma">0</span>°
+            </div>
+        </div>
+        
+        <button onclick="calibrate()">Recalibrate</button>
+        <button onclick="window.location.href='index.html'">Go to Game</button>
+    </div>
+    
+    <script>
+        let isCalibrated = false;
+        let calibrationOffset = { alpha: 0, beta: 0, gamma: 0 };
+        
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        function updateMotionDisplay(event) {
+            document.getElementById('alpha').textContent = Math.round(event.alpha || 0);
+            document.getElementById('beta').textContent = Math.round(event.beta || 0);
+            document.getElementById('gamma').textContent = Math.round(event.gamma || 0);
+            
+            if (isCalibrated) {
+                document.getElementById('calAlpha').textContent = Math.round((event.alpha || 0) - calibrationOffset.alpha);
+                document.getElementById('calBeta').textContent = Math.round((event.beta || 0) - calibrationOffset.beta);
+                document.getElementById('calGamma').textContent = Math.round((event.gamma || 0) - calibrationOffset.gamma);
+            }
+        }
+        
+        function calibrate() {
+            isCalibrated = false;
+            updateStatus('Hold device flat and level, then tilt to test...', 'warning');
+        }
+        
+        function startMotionTracking() {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', (event) => {
+                    if (!isCalibrated) {
+                        // Calibrate on first reading
+                        calibrationOffset.alpha = event.alpha || 0;
+                        calibrationOffset.beta = event.beta || 0;
+                        calibrationOffset.gamma = event.gamma || 0;
+                        isCalibrated = true;
+                        updateStatus('Motion sensors active! Tilt your device to test.', 'success');
+                    }
+                    
+                    updateMotionDisplay(event);
+                });
+                
+                updateStatus('Motion sensors enabled. Calibrating...', 'warning');
+            } else {
+                updateStatus('Device orientation not supported', 'error');
+            }
+        }
+        
+        // Check for motion support and request permission
+        if (window.DeviceOrientationEvent) {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                updateStatus('Click to enable motion sensors', 'warning');
+                document.addEventListener('click', () => {
+                    DeviceOrientationEvent.requestPermission().then(permissionState => {
+                        if (permissionState === 'granted') {
+                            startMotionTracking();
+                        } else {
+                            updateStatus('Motion permission denied', 'error');
+                        }
+                    }).catch(() => {
+                        updateStatus('Failed to get motion permission', 'error');
+                    });
+                }, { once: true });
+            } else {
+                startMotionTracking();
+            }
+        } else {
+            updateStatus('Device orientation not supported on this device/browser', 'error');
+        }
+    </script>
+</body>
+</html>

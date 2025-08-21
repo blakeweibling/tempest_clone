@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempest Clone - Mobile</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00ff00">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tempest">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+        <div class="game-container">
+        <div class="side-panel">
+            <div class="control-info">
+                <p><strong>Desktop Controls:</strong></p>
+                <p>← → Arrow Keys: Move Left/Right</p>
+                <p>↑ ↓ Arrow Keys: Move In/Out</p>
+                <p>Spacebar: Fire</p>
+                <p>P: Pause</p>
+            </div>
+            <div class="legend">
+                <p><strong>Legend:</strong></p>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00ff00;"></div>
+                    <span>Player Ship</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff0000;"></div>
+                    <span>Red Enemy (1 HP)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff6600;"></div>
+                    <span>Orange Enemy (3 HP)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffff00;"></div>
+                    <span>Yellow Enemy (1 HP)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #0088ff;"></div>
+                    <span>Blue Health Power-up</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00ffff;"></div>
+                    <span>Player Bullets</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff0000;"></div>
+                    <span>Enemy Bullets</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-game-area">
+            <div class="game-header">
+                <h1>TEMPEST II</h1>
+                <div class="score-board">
+                    <div class="score">Score: <span id="score">0</span></div>
+                    <div class="health-container">
+                        <div class="health-bar">
+                            <div id="healthBar" class="health-fill"></div>
+                        </div>
+                        <span class="health-text">Health: <span id="health">100</span>%</span>
+                    </div>
+                    <div class="level">Level: <span id="level">1</span></div>
+                </div>
+            </div>
+            
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            
+            <div class="game-controls">
+                <button id="fullscreenBtn" class="control-btn">Fullscreen</button>
+                <button id="installBtn" class="control-btn install-btn" style="display: none;">Install App</button>
+            </div>
+            
+            <!-- Mobile Controls Info -->
+            <div class="mobile-controls">
+                <h4>Mobile Controls</h4>
+                <p><strong>Tilt Left/Right:</strong> Move ship around the tube</p>
+                <p><strong>Tilt Forward/Back:</strong> Move ship in/out</p>
+                <p><strong>Tap Screen:</strong> Fire weapon</p>
+                <p><em>Hold device flat and level to calibrate</em></p>
+            </div>
+            
+            <div class="controls">
+                <div class="control-info">
+                    <p><strong>Desktop Controls:</strong></p>
+                    <p>← → Arrow Keys: Move Left/Right</p>
+                    <p>↑ ↓ Arrow Keys: Move In/Out</p>
+                    <p>Spacebar: Fire</p>
+                    <p>P: Pause</p>
+                </div>
+                <div class="legend">
+                    <p><strong>Legend:</strong></p>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #00ff00;"></div>
+                        <span>Player Ship</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ff0000;"></div>
+                        <span>Red Enemy (1 HP)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ff6600;"></div>
+                        <span>Orange Enemy (3 HP)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ffff00;"></div>
+                        <span>Yellow Enemy (1 HP)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #0088ff;"></div>
+                        <span>Blue Health Power-up</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #00ffff;"></div>
+                        <span>Player Bullets</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ff0000;"></div>
+                        <span>Enemy Bullets</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Motion Indicator (for debugging) -->
+    <div id="motionIndicator" class="motion-indicator">
+        <div>Alpha: <span id="alphaValue">0</span>°</div>
+        <div>Beta: <span id="betaValue">0</span>°</div>
+        <div>Gamma: <span id="gammaValue">0</span>°</div>
+    </div>
+    
+    <div id="gameOver" class="game-over hidden">
+        <h2>Game Over</h2>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <button id="restartBtn">Play Again</button>
+    </div>
+    
+    <div id="pauseScreen" class="pause-screen hidden">
+        <h2>Paused</h2>
+        <p>Press P to resume</p>
+    </div>
+    
+    <script src="game.js"></script>
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('installBtn');
+            if (installBtn) {
+                installBtn.style.display = 'inline-block';
+                installBtn.addEventListener('click', () => {
+                    installBtn.style.display = 'none';
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                        } else {
+                            console.log('User dismissed the install prompt');
+                        }
+                        deferredPrompt = null;
+                    });
+                });
+            }
+        });
+
+        // Check if running as PWA
+        window.addEventListener('load', () => {
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                document.body.classList.add('pwa-mode');
+                console.log('Running in PWA mode');
+            }
+        });
+    </script>
+</body>
+</html>
