@@ -16,6 +16,25 @@ body {
 }
 
 .game-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.side-panel {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ff00;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+    min-width: 250px;
+    flex-shrink: 0;
+}
+
+.main-game-area {
     text-align: center;
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid #00ff00;
@@ -57,6 +76,61 @@ body {
     display: block;
     margin: 0 auto;
     box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2);
+    max-width: 100%;
+    max-height: 70vh;
+    width: auto;
+    height: auto;
+}
+
+.game-controls {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.control-btn {
+    background: #00ff00;
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0 5px;
+}
+
+.control-btn:hover {
+    background: #00cc00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    transform: scale(1.05);
+}
+
+.health-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.health-bar {
+    width: 120px;
+    height: 12px;
+    background: rgba(255, 0, 0, 0.3);
+    border: 1px solid #ff0000;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000, #ff6600, #ffff00, #00ff00);
+    width: 100%;
+    transition: width 0.3s ease;
+}
+
+.health-text {
+    font-size: 0.9em;
 }
 
 .controls {
@@ -65,6 +139,7 @@ body {
     background: rgba(0, 255, 0, 0.05);
     border: 1px solid #00ff00;
     border-radius: 5px;
+    display: none;
 }
 
 .control-info p {
@@ -72,15 +147,44 @@ body {
     font-size: 0.9em;
 }
 
+.legend {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00ff00;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.legend p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    font-size: 0.85em;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #00ff00;
+    border-radius: 2px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
 .game-over, .pause-screen {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.9);
     border: 2px solid #00ff00;
     border-radius: 10px;
-    padding: 30px;
+    padding: 0;
     text-align: center;
     z-index: 1000;
 }
@@ -121,13 +225,24 @@ body {
 /* Responsive design */
 @media (max-width: 900px) {
     .game-container {
+        flex-direction: column;
+        gap: 15px;
         padding: 10px;
         margin: 10px;
     }
     
+    .side-panel {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .main-game-area {
+        width: 100%;
+    }
+    
     #gameCanvas {
         width: 100%;
-        max-width: 600px;
+        max-width: 100%;
         height: auto;
     }
     
@@ -140,9 +255,131 @@ body {
         gap: 10px;
     }
     
-    .score, .lives, .level {
+    .score, .health-container, .level {
         min-width: auto;
     }
+}
+
+/* Fullscreen styles */
+.fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+/* Override body styles when in fullscreen */
+.fullscreen body {
+    display: block !important;
+    justify-content: initial !important;
+    align-items: initial !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force fullscreen container to ignore any parent positioning */
+.fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    transform: none !important;
+    max-width: none !important;
+}
+
+.fullscreen #gameCanvas {
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+}
+
+.fullscreen .game-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+}
+
+.fullscreen .game-controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10000;
+    padding: 0;
+    margin: 0;
+}
+
+.fullscreen .side-panel {
+    display: none;
+}
+
+.fullscreen .game-container {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    justify-content: initial !important;
+    align-items: initial !important;
+}
+
+.fullscreen .main-game-area {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-align: initial !important;
+}
+
+.fullscreen .controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.8);
+    display: block;
+    padding: 0;
+    margin: 0;
+}
+
+.fullscreen .game-over, .fullscreen .pause-screen {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 99999 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Animation for score updates */
